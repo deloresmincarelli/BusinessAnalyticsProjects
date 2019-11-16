@@ -1,50 +1,50 @@
-﻿school,percent_of_classes_under_20,student_faculty_ratio,alumni_giving_rate,private,tuition,enrollment,meanstartsalary
-Boston College,39,13,25,1,57910,14107,59900
-Brandeis University ,68,8,33,1,57561,5801,55500
-Brown University,60,8,40,1,27668,2516,44500
-California Institute of Technology,65,3,46,1,54600,2233,83200
-Carnegie Mellon University,67,10,28,1,57119,14625,74200
-Case Western Reserve Univ.,52,8,31,1,50904,11891,65200
-College of William and Mary,45,12,27,1,22922,8817,55100
-Columbia University,69,7,31,1,61850,26338,67500
-Cornell University,72,13,35,1,57222,23600,66900
-Dartmouth College,61,10,53,1,57204,6571,65800
-Duke University,68,8,45,1,58198,16606,68500
-Emory University,65,7,37,1,53804,14459,59200
-Georgetown University,54,10,29,1,56058,19204,59900
-Harvard University,73,8,46,1,51925,20739,69000
-John Hopkins University,64,9,27,1,55350,26152,66100
-Lehigh University,55,11,40,1,55240,6849,67500
-Massachusetts Inst. of Technology,65,6,44,1,53790,11574,82300
-New York University,63,13,13,1,53508,51847,59100
-Northwestern University,66,8,30,1,56691,21591,61000
-Pennsylvania State Univ.,32,19,21,0,18450,46810,58300
-Princeton University,68,5,67,1,51870,8347,70200
-Rice University,62,8,40,1,49112,7124,67700
-Stanford University,69,7,34,1,53529,17381,73800
-Tufts University ,67,9,29,1,58578,11586,61200
-Tulane University,56,12,17,1,56800,11722,51900
-U. of California-Berleley,58,17,18,0,14184,42501,66600
-U. of California-Davis,32,19,7,0,14492,38097,57600
-U. of California-Irvine,42,20,9,0,13727,36032,56300
-U. of California-Los Angeles,41,18,13,0,13226,45930,58400
-U. of California-San Diego,48,19,8,0,14170,37887,59900
-U. of California-Santa Barbara,45,20,12,0,14391,25976,55600
-U. of Chicago,65,4,36,1,59298,14347,60100
-U. of Florida,31,23,19,0,6380,52218,54800
-U. of Illinois-Urbana Champaign,29,15,23,0,16210,49702,61400
-U. of Michigan-Ann Arbor,51,15,13,0,15558,46716,63700
-U. of North Carolina-Chapel Hill,40,16,26,0,9043,30011,51000
-U. of Notre Dame,53,13,49,1,55553,12607,65300
-U. of Pennsylvania,65,7,41,1,57770,22376,68100
-U. of Rochester,63,10,23,1,56026,11817,57500
-U. of Southern California,53,13,22,1,58195,47310,60600
-U. of Texas-Austin,39,21,13,0,10818,51832,58800
-U. of Virginia,44,13,28,0,17891,24639,61600
-U. of Washington,37,12,12,0,11465,47361,59000
-U. of Wisconsin-Madison,37,13,13,0,10725,44411,55900
-Vanderbuilt University,68,9,31,1,52070,12824,63000
-Wake Forest University,59,11,38,1,55440,8401,55900
-Washington University-St. Louis,73,7,33,1,55292,15852,62500
-Yale University,77,7,50,1,55500,13433,64500
-University of Cincinnati,38,16,12,0,11660,38062,52900
+﻿school,percent_of_classes_under_20,student_faculty_ratio,alumni_giving_rate,private,tuition,enrollment,meanstartsalary,AthA,AthB,PartyA
+Boston College,39,13,25,1,57910,14107,59900,1,0,1
+Brandeis University ,68,8,33,1,57561,5801,55500,0,0,0
+Brown University,60,8,40,1,27668,2516,44500,0,1,1
+California Institute of Technology,65,3,46,1,54600,2233,83200,0,0,0
+Carnegie Mellon University,67,10,28,1,57119,14625,74200,0,0,0
+Case Western Reserve Univ.,52,8,31,1,50904,11891,65200,0,0,0
+College of William and Mary,45,12,27,1,22922,8817,55100,0,1,0
+Columbia University,69,7,31,1,61850,26338,67500,0,1,1
+Cornell University,72,13,35,1,57222,23600,66900,0,1,1
+Dartmouth College,61,10,53,1,57204,6571,65800,0,1,1
+Duke University,68,8,45,1,58198,16606,68500,1,0,1
+Emory University,65,7,37,1,53804,14459,59200,0,1,0
+Georgetown University,54,10,29,1,56058,19204,59900,0,1,1
+Harvard University,73,8,46,1,51925,20739,69000,0,1,1
+John Hopkins University,64,9,27,1,55350,26152,66100,0,0,0
+Lehigh University,55,11,40,1,55240,6849,67500,0,1,1
+Massachusetts Inst. of Technology,65,6,44,1,53790,11574,82300,0,1,1
+New York University,63,13,13,1,53508,51847,59100,0,0,1
+Northwestern University,66,8,30,1,56691,21591,61000,1,0,1
+Pennsylvania State Univ.,32,19,21,0,18450,46810,58300,1,0,1
+Princeton University,68,5,67,1,51870,8347,70200,0,1,0
+Rice University,62,8,40,1,49112,7124,67700,1,0,1
+Stanford University,69,7,34,1,53529,17381,73800,1,0,0
+Tufts University ,67,9,29,1,58578,11586,61200,0,1,0
+Tulane University,56,12,17,1,56800,11722,51900,1,0,1
+U. of California-Berleley,58,17,18,0,14184,42501,66600,1,0,1
+U. of California-Davis,32,19,7,0,14492,38097,57600,1,0,0
+U. of California-Irvine,42,20,9,0,13727,36032,56300,0,1,0
+U. of California-Los Angeles,41,18,13,0,13226,45930,58400,1,0,1
+U. of California-San Diego,48,19,8,0,14170,37887,59900,0,1,0
+U. of California-Santa Barbara,45,20,12,0,14391,25976,55600,0,1,1
+U. of Chicago,65,4,36,1,59298,14347,60100,0,1,0
+U. of Florida,31,23,19,0,6380,52218,54800,1,0,1
+U. of Illinois-Urbana Champaign,29,15,23,0,16210,49702,61400,1,0,1
+U. of Michigan-Ann Arbor,51,15,13,0,15558,46716,63700,1,0,1
+U. of North Carolina-Chapel Hill,40,16,26,0,9043,30011,51000,1,0,1
+U. of Notre Dame,53,13,49,1,55553,12607,65300,1,0,1
+U. of Pennsylvania,65,7,41,1,57770,22376,68100,0,1,1
+U. of Rochester,63,10,23,1,56026,11817,57500,0,1,0
+U. of Southern California,53,13,22,1,58195,47310,60600,1,0,1
+U. of Texas-Austin,39,21,13,0,10818,51832,58800,1,0,1
+U. of Virginia,44,13,28,0,17891,24639,61600,1,0,1
+U. of Washington,37,12,12,0,11465,47361,59000,1,0,1
+U. of Wisconsin-Madison,37,13,13,0,10725,44411,55900,1,0,1
+Vanderbuilt University,68,9,31,1,52070,12824,63000,1,0,1
+Wake Forest University,59,11,38,1,55440,8401,55900,1,0,1
+Washington University-St. Louis,73,7,33,1,55292,15852,62500,1,0,1
+Yale University,77,7,50,1,55500,13433,64500,1,0,1
+University of Cincinnati,38,16,12,0,11660,38062,52900,1,0,1
