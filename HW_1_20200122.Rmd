@@ -1,3 +1,8 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
 --------------------------
 Homework 1 -- Group 8
 -------------------------
@@ -7,7 +12,7 @@ setwd("H://_UC/7046DataMining1/HW1")
 getwd()
 ```
 
-# The Iris dataset -- Classification versus Clustering
+# The Iris dataset -- Classification and Clustering
 Classification and clustering are two important topics in Data Mining.  In this paper, we explore physical characteristics of 3 Iris species and create two models.  (1) The classification model uses what we know about each species to create a model.  When new data is introduced into the model, it will try to match that data to one of the known species. (2) Alternatively, the clustering model does not assume any target goal; rather, we put everything we know for all of our observations into the clustering algorithm and it determines how to group like observations together.  
 ```{r include = FALSE}
 
@@ -46,11 +51,7 @@ library(FNN)
 library(caret)
 library(dplyr)
 ```
-
-```{r}
-
-```
-####Summary of Iris data
+#### Summary of Iris data
 ```{r echo = FALSE}
 
 #help(iris)
@@ -143,7 +144,8 @@ print(PetalScatter + labs(title= "Petal Width & Length by Species",y="Petal Widt
 # Libraries
 ```
 
-#### Density Plots - these plots show us how the data is distributed.  
+#### Density Plots - these plots show us how the data is distributed.
+Interpretation: (need)
 
 ```{r echo = FALSE}
 
@@ -188,10 +190,10 @@ print(PW_Density + labs(title= "Petal Width",y="Density", x = "Petal Width (cm)"
 ```
 
 
-Classification
+## Classification
 First, we will separate our data into a training (80%) and testing set (20%).  Using the training data, we will train our model to recognize characteristics of setosa, virginica and versicolor species. Next, we will introduce our test data and use the K-Nearest Neighbor (KNN) algorithm to classify the new flowers.  The KNN algorithm uses a "similarity" measure to assess which "known" species the new data is most similar to.  We can specify the number of neighbors to use in the assessment.  We will start with k=3.  (It is good to use odd  numbers to break a tie). 
 
-We can see that when k = 3, our accuracy is .9333. There were two points that were mis-classified as versicolor instead of viginica.  If we adjust the value of "k" we may be able to improve our results. 
+We can see that when k = 3, our accuracy is .9333. There were two points that were mis-classified as versicolor instead of viginica.  
 
 ```{r echo = FALSE}
 # Partitioning
@@ -230,14 +232,35 @@ accuracy.df
 
 ```
 
-
 ```{r}
 
 ```
+## Clustering using K-Means
+Clustering involves grouping objects together that are "most like" one another. Objects in one cluster will be different from objects in another cluster, and one observation can belong to only one cluster. There is no targeted "answer" or "truth" that you can objectively measure your result against, because the purpose of clustering is to mathematically assess similarities and provide insight to us that we may never otherwise observe.  
+With K-Means, the only direction we provide is the number of clusters we desire as output.  Since we know that our population of flowers has 3 different and distinct species, we could use K=3 as a starting point, but it is important to  know that the resulting clusters may NOT be differentiated by species.  Again, it is solely due to mathematics.  
+
+We also will require the algorithm to try different values of the starting cluster assignment, (assigned to each observation), which is the first step in it's computation.  This random value can influence the result, so we specify the function to try 20 variations and choose the result with the minimum within-cluster variation.  
+
+In this example, we will NOT break our data into training and test datasets because again, there is no "truth" that we are trying to achieve and therefore could not quantify it's performance. 
 
 
-```{r}
+```{r echo = FALSE}
+# Used reference at https://www.r-bloggers.com/k-means-clustering-in-r/
 
+
+set.seed(7046)
+irisKMCluster <- kmeans(iris[, 1:4], 3, nstart = 20)
+irisKMCluster
+#K-means clustering with 3 clusters of sizes 38, 62, 50
+
+
+
+```
+Let's look at how well the K-Means performed.
+
+```{r echo = FALSE}
+table(irisKMCluster$cluster, iris$Species)
+   
 ```
 
 
