@@ -1,0 +1,244 @@
+--------------------------
+Homework 1 -- Group 8
+-------------------------
+
+```{r setup, include=FALSE}
+setwd("H://_UC/7046DataMining1/HW1")
+getwd()
+```
+
+# The Iris dataset -- Classification versus Clustering
+Classification and clustering are two important topics in Data Mining.  In this paper, we explore physical characteristics of 3 Iris species and create two models.  (1) The classification model uses what we know about each species to create a model.  When new data is introduced into the model, it will try to match that data to one of the known species. (2) Alternatively, the clustering model does not assume any target goal; rather, we put everything we know for all of our observations into the clustering algorithm and it determines how to group like observations together.  
+```{r include = FALSE}
+
+##################################################################################
+# Import data and libraries
+##################################################################################
+pkgs <- c(
+  "animation",   # for pre-built statistical animations
+  "dplyr",       # for data wrangling
+  "ggplot2",     # for drawing nicer graphics
+  "gridExtra",   # for grid.arrange() function
+  "HistData",    # for historical data sets
+  "investr",     # for inverse estimation
+  "magick",      # for working with images
+  "roundhouse" ,  # for pure awesomeness
+  "GGally",  # for gggplot2 extensions
+  "pdp",     # for (corrected) Boston housing data
+  "plotly",  # for interactive plots
+  "tibble",  # for nicer data frames
+  "vip" ,     # for variable importance plots
+  "class", 
+  "gmodels",   #used to make table of results of model
+  "FNN"
+)
+
+# Install required (CRAN) packages
+for (pkg in pkgs) {
+  if (!(pkg %in% installed.packages()[, "Package"])) {
+    install.packages(pkg)
+  }
+}
+
+
+library(datasets)
+library(FNN)
+library(caret)
+library(dplyr)
+```
+
+```{r}
+
+```
+####Summary of Iris data
+```{r echo = FALSE}
+
+#help(iris)
+#summary(iris)
+#head(iris)
+#str(iris)
+```
+Number of observations for each species
+```{r echo = FALSE}
+# Division of `Species`
+table(iris$Species)
+```
+Percent of each species
+```{r echo = FALSE}
+# Percentual division of `Species`
+round(prop.table(table(iris$Species)) * 100, digits = 1)
+```
+
+
+```{r echo = FALSE}
+#class(iris)
+#summary(iris[c("Petal.Width", "Sepal.Width")])
+```
+Statistics
+As we look at the median, min and max of each variable we see that they all fall in a similar range, so normalizing the data (needed when you have a mix of dummy variables and continuous variables) is not needed.  
+```{r echo = FALSE}
+irisdata.nums<-iris[,1:4]
+sapply(irisdata.nums, function(irisdata.nums) c( "Stand dev" = sd(irisdata.nums), 
+                         "Mean"= mean(irisdata.nums,na.rm=TRUE),
+                         "n" = length(irisdata.nums),
+                         "Median" = median(irisdata.nums),
+                         "CoeffofVariation" = sd(irisdata.nums)/mean(irisdata.nums,na.rm=TRUE),
+                         "Minimum" = min(irisdata.nums),
+                         "Maximun" = max(irisdata.nums),
+                         "1st Quantile" = quantile(irisdata.nums,.25),
+                         "3rd Quartile" = quantile(irisdata.nums,.75)
+                    )
+)
+```
+
+Lets explore some relationships
+First, we visualize a relationship between sepal length and width for each species.   The Setosa species has a shorter length and greater width than the othes. Also, Virginica has a larger range sepal length than the others.  These differentiators are an encouraging sign that there are distinguishing characteristics that our models can work with.  
+```{r echo = FALSE}
+# loading packages
+library(ggplot2)
+library(magrittr)
+library(class)
+
+# sepal width vs. sepal length
+SepalScatter<-iris %>%
+  ggplot(aes(x=Sepal.Length, y=Sepal.Width, color=Species)) +
+  geom_point()
+print(SepalScatter + labs(title= "Sepal Width & Length by Species",y="Sepal Width (cm)", x = "Sepal Length (cm)"))
+
+
+```
+```{r echo = FALSE}
+
+```
+Next, for Petal width and length, Setosa stands alone with a smaller length and width. Virginica shows a little more variability in width and length, and we can see a few observations of Versicolor creeping into the Virginica territory.  Overall, we see patterns and this will lend itself well toward classification and clustering. 
+
+```{r echo = FALSE}
+# Petal
+PetalScatter<-iris %>%
+  ggplot(aes(x=Petal.Length, y=Petal.Width, color=Species)) +
+  geom_point()
+print(PetalScatter + labs(title= "Petal Width & Length by Species",y="Petal Width (cm)", x = "Petal Length (cm)"))
+
+
+```
+```{r echo = FALSE}
+# I dont think any of this stuff adds value
+# Overall correlation `Petal.Length` and `Petal.Width`
+#cor(iris$Petal.Length, iris$Petal.Width)
+# Return values of `iris` levels 
+# x=levels(iris$Species)
+# 
+# # Print Setosa correlation matrix
+# print(x[1])
+# cor(iris[iris$Species==x[1],1:4])
+# 
+# # Print Versicolor correlation matrix
+# print(x[2])
+# cor(iris[iris$Species==x[2],1:4])
+# 
+# # Print Virginica correlation matrix
+# print(x[3])
+# cor(iris[iris$Species==x[3],1:4])
+
+# Libraries
+```
+
+#### Density Plots - these plots show us how the data is distributed.  
+
+```{r echo = FALSE}
+
+
+
+# Make the histogram
+SL_Density<-iris %>%
+  ggplot( aes(x=Sepal.Length)) +
+    geom_density(fill="gray", color="black", alpha=0.8) +
+    ggtitle("Sepal Length")
+print(SL_Density + labs(title= "Sepal Length",y="Density", x = "Sepal Length (cm)"))
+
+```
+
+```{r echo = FALSE}
+SW_Density<-iris %>%
+  ggplot( aes(x=Sepal.Width)) +
+    geom_density(fill="gray", color="black", alpha=0.8) +
+    ggtitle("Sepal Width")
+print(SW_Density + labs(title= "Sepal Width",y="Density", x = "Sepal Width (cm)"))
+
+
+```
+
+Note, the petal density plots show a bimodal pattern, most likely due to the sentosa species (refer to scatter plots above)
+
+```{r echo = FALSE}
+PL_Density<-iris %>%
+  ggplot( aes(x=Petal.Length)) +
+    geom_density(fill="gray", color="black", alpha=0.8) +
+    ggtitle("Petal Length")
+print(PL_Density + labs(title= "Petal Length",y="Density", x = "Petal Length (cm)"))
+```
+
+```{r echo = FALSE}
+PW_Density<-iris %>%
+  ggplot( aes(x=Petal.Width)) +
+    geom_density(fill="gray", color="black", alpha=0.8) +
+    ggtitle("Petal Width")
+print(PW_Density + labs(title= "Petal Width",y="Density", x = "Petal Width (cm)"))
+
+```
+
+
+Classification
+First, we will separate our data into a training (80%) and testing set (20%).  Using the training data, we will train our model to recognize characteristics of setosa, virginica and versicolor species. Next, we will introduce our test data and use the K-Nearest Neighbor (KNN) algorithm to classify the new flowers.  The KNN algorithm uses a "similarity" measure to assess which "known" species the new data is most similar to.  We can specify the number of neighbors to use in the assessment.  We will start with k=3.  (It is good to use odd  numbers to break a tie). 
+
+We can see that when k = 3, our accuracy is .9333. There were two points that were mis-classified as versicolor instead of viginica.  If we adjust the value of "k" we may be able to improve our results. 
+
+```{r echo = FALSE}
+# Partitioning
+# Here we partition the data into training (80%) and validation (20%) sets.
+# partition the data
+set.seed(7046)
+train.index <- sample(nrow(iris), nrow(iris) * 0.8)
+valid.index <- as.numeric(setdiff(rownames(iris), train.index))
+iris.train <- iris[train.index, ]
+iris.valid <- iris[valid.index, ]
+
+# remember to exclude both outcome variables from your list of predictors
+nn <- knn(train = iris.train[, 1:4], test = iris.valid[, 1:4], cl = iris.train$Species, k = 3)
+
+confusionMatrix(nn, as.factor(iris.valid$Species), positive = "1")
+```
+Now, we will try various values of "k" to see which one results in the highest accuracy.  Here, we can see that k=1 and k=2 gives us the best results.
+
+```{r echo = FALSE}
+#Determine Best k
+#We will now determine the optimal value for k by evaluating the accuracy at several levels k. 
+#We'll look at values of k 1-20, which is generally sufficient.
+
+set.seed(7046)
+
+# initialize a data frame with two columns: k and accuracy, note rep(0,20) provides a list of 20 zeros
+accuracy.df <- data.frame(k = seq(1, 20, 1), accuracy = rep(0, 20))
+
+# compute knn for different k on validation set
+for (i in 1:20) {
+  knn.pred <- knn(train = iris.train[, 1:4], test = iris.valid[, 1:4], 
+                  cl = iris.train$Species, k = i)
+  accuracy.df[i, 2] <- confusionMatrix(knn.pred, as.factor(iris.valid$Species), positive = "1")$overall[1]
+}
+accuracy.df
+
+```
+
+
+```{r}
+
+```
+
+
+```{r}
+
+```
+
+
+
