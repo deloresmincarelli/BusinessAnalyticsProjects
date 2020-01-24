@@ -1,7 +1,8 @@
 ---
 output:
-  html_document: default
+  word_document: default
   pdf_document: default
+  html_document: default
 ---
 --------------------------
 Homework 1 -- Group 8
@@ -12,7 +13,7 @@ setwd("H://_UC/7046DataMining1/HW1")
 getwd()
 ```
 
-# The Iris dataset -- Classification and Clustering
+# Classification and Clustering of the Iris dataset 
 Classification and clustering are two important topics in Data Mining.  In this paper, we explore physical characteristics of 3 Iris species and create two models.  (1) The classification model uses what we know about each species to create a model.  When new data is introduced into the model, it will try to match that data to one of the known species. (2) Alternatively, the clustering model does not assume any target goal; rather, we put everything we know for all of our observations into the clustering algorithm and it determines how to group like observations together.  
 ```{r include = FALSE}
 
@@ -35,7 +36,8 @@ pkgs <- c(
   "vip" ,     # for variable importance plots
   "class", 
   "gmodels",   #used to make table of results of model
-  "FNN"
+  "FNN", 
+  "factoextra"
 )
 
 # Install required (CRAN) packages
@@ -50,6 +52,14 @@ library(datasets)
 library(FNN)
 library(caret)
 library(dplyr)
+library(e1071)
+library(tidyverse)  # data manipulation
+library(cluster)    # clustering algorithms
+library(factoextra) # clustering visualization
+library(dendextend) # for comparing two dendrograms
+library(ggplot2)
+library(magrittr)
+library(class)
 ```
 #### Summary of Iris data
 ```{r echo = FALSE}
@@ -75,8 +85,8 @@ round(prop.table(table(iris$Species)) * 100, digits = 1)
 #class(iris)
 #summary(iris[c("Petal.Width", "Sepal.Width")])
 ```
-Statistics
-As we look at the median, min and max of each variable we see that they all fall in a similar range, so normalizing the data (needed when you have a mix of dummy variables and continuous variables) is not needed.  
+#### Statistics
+As we look at the median, min and max of each variable we see that they all fall in a similar range. We may still need to normalize the data so that each variable has "equal footing".  
 ```{r echo = FALSE}
 irisdata.nums<-iris[,1:4]
 sapply(irisdata.nums, function(irisdata.nums) c( "Stand dev" = sd(irisdata.nums), 
@@ -92,13 +102,13 @@ sapply(irisdata.nums, function(irisdata.nums) c( "Stand dev" = sd(irisdata.nums)
 )
 ```
 
-Lets explore some relationships
-First, we visualize a relationship between sepal length and width for each species.   The Setosa species has a shorter length and greater width than the othes. Also, Virginica has a larger range sepal length than the others.  These differentiators are an encouraging sign that there are distinguishing characteristics that our models can work with.  
+#### Lets explore some relationships
+First, we visualize a relationship between sepal length and width for each species.   The Setosa species has a shorter length and greater width than the othes. Also, Virginica has a larger range sepal length than the others.  This is an encouraging sign that there are distinguishing characteristics that our models can work with.  
 ```{r echo = FALSE}
 # loading packages
-library(ggplot2)
-library(magrittr)
-library(class)
+# library(ggplot2)
+# library(magrittr)
+# library(class)
 
 # sepal width vs. sepal length
 SepalScatter<-iris %>%
@@ -144,8 +154,10 @@ print(PetalScatter + labs(title= "Petal Width & Length by Species",y="Petal Widt
 # Libraries
 ```
 
-#### Density Plots - these plots show us how the data is distributed.
-Interpretation: (need)
+#### Density Plots
+These plots show us how the data is distributed.  Unlike a histogram, density plots are not subject to the number of bins selected (which can radically change how the distribution appears.)
+
+Interpretation: The "flattness" of then Sepal Length density indicates many observations in the 5 to 6.5 cm range.  
 
 ```{r echo = FALSE}
 
@@ -160,6 +172,8 @@ print(SL_Density + labs(title= "Sepal Length",y="Density", x = "Sepal Length (cm
 
 ```
 
+On the other hand, Sepal width has a lot of observations in a vary narrow range, represented by the narrow spike around 3cm.
+
 ```{r echo = FALSE}
 SW_Density<-iris %>%
   ggplot( aes(x=Sepal.Width)) +
@@ -170,7 +184,7 @@ print(SW_Density + labs(title= "Sepal Width",y="Density", x = "Sepal Width (cm)"
 
 ```
 
-Note, the petal density plots show a bimodal pattern, most likely due to the sentosa species (refer to scatter plots above)
+The petal density plots show a bimodal pattern, most likely due to the sentosa species.  Recall, in the scatter plots, sentosa was grouped far from the other two species.  
 
 ```{r echo = FALSE}
 PL_Density<-iris %>%
@@ -190,10 +204,17 @@ print(PW_Density + labs(title= "Petal Width",y="Density", x = "Petal Width (cm)"
 ```
 
 
-## Classification
-First, we will separate our data into a training (80%) and testing set (20%).  Using the training data, we will train our model to recognize characteristics of setosa, virginica and versicolor species. Next, we will introduce our test data and use the K-Nearest Neighbor (KNN) algorithm to classify the new flowers.  The KNN algorithm uses a "similarity" measure to assess which "known" species the new data is most similar to.  We can specify the number of neighbors to use in the assessment.  We will start with k=3.  (It is good to use odd  numbers to break a tie). 
+## Classification 
+### Problem:  
+Given a dataset with physical characteristics of iris flowers and their known species, how can we accurately categorize new observations into the correct species? 
 
-We can see that when k = 3, our accuracy is .9333. There were two points that were mis-classified as versicolor instead of viginica.  
+### Approach
+We will use the K-Nearest Neighbor (KNN) algorithm to classify the new flowers.  The KNN algorithm uses a "similarity" measure to assess which "known" species the new data is most similar to.  We can specify the number of neighbors to use in the assessment.  We will start with k=3.  (It is good to use odd  numbers to break a tie). 
+
+We will separate our data into a training (80%) and testing set (20%).  Using the training data, we will train our model to recognize characteristics of setosa, virginica and versicolor species. 
+
+### Performance
+We can see that when k = 3, our accuracy is 93.3% (.9333).  There were two points that were mis-classified as versicolor instead of viginica.  
 
 ```{r echo = FALSE}
 # Partitioning
@@ -210,7 +231,7 @@ nn <- knn(train = iris.train[, 1:4], test = iris.valid[, 1:4], cl = iris.train$S
 
 confusionMatrix(nn, as.factor(iris.valid$Species), positive = "1")
 ```
-Now, we will try various values of "k" to see which one results in the highest accuracy.  Here, we can see that k=1 and k=2 gives us the best results.
+Now, we will try various values of "k" to see which one results in the highest accuracy.  Here, we can see that there is no reason to go beyond k=1 and k=2 for the best results of 96.67%
 
 ```{r echo = FALSE}
 #Determine Best k
@@ -236,13 +257,15 @@ accuracy.df
 
 ```
 ## Clustering using K-Means
+### Problem
 Clustering involves grouping objects together that are "most like" one another. Objects in one cluster will be different from objects in another cluster, and one observation can belong to only one cluster. There is no targeted "answer" or "truth" that you can objectively measure your result against, because the purpose of clustering is to mathematically assess similarities and provide insight to us that we may never otherwise observe.  
-With K-Means, the only direction we provide is the number of clusters we desire as output.  Since we know that our population of flowers has 3 different and distinct species, we could use K=3 as a starting point, but it is important to  know that the resulting clusters may NOT be differentiated by species.  Again, it is solely due to mathematics.  
+
+Given the iris dataset, how will K-Means organize the data into meaningful groups?  Will the result look like our species groupings that we already know?
+
+### Approach
+With K-Means, the only direction we provide is the number of clusters we desire as output.  We can use our domain knowledge and start with k=3.   There are also functions that we can use to determine the "optimal" number of clusters.  Ultimately, the best number of clusters is what works for the business purpose.
 
 We also will require the algorithm to try different values of the starting cluster assignment, (assigned to each observation), which is the first step in it's computation.  This random value can influence the result, so we specify the function to try 20 variations and choose the result with the minimum within-cluster variation.  
-
-In this example, we will NOT break our data into training and test datasets because again, there is no "truth" that we are trying to achieve and therefore could not quantify it's performance. 
-
 
 ```{r echo = FALSE}
 # Used reference at https://www.r-bloggers.com/k-means-clustering-in-r/
@@ -256,12 +279,96 @@ irisKMCluster
 
 
 ```
-Let's look at how well the K-Means performed.
+### Performance:  
+Compared to our known subject-matter knowledge on each observation's species, the K - Means perfectly categorizes Setosa.  However, as we saw from the scatter plots above, Versicolor and Virginica had observations that were very similiar.  K-Means had the most trouble with Virginica, mis-categorizing 14 observationis, and 2 for Versicolor.   Net, 16/150 = 10.67% mis-classified.  
 
 ```{r echo = FALSE}
 table(irisKMCluster$cluster, iris$Species)
    
 ```
 
+## Hierarchical Clustering
+### Problem
+In this scenario will will try a different clustering algorith to compare to K - Means.  Hierarchical clustering does not require us to pre-specify the number of clusters to be generated as is required by the k-means approach. Furthermore, hierarchical clustering results in a tree representation of the observations, called a dendrogram.  However, it is computationally expensive, so this approach may not work with large datasets.  
 
+### Approach
+Data preparation:  The data must be standardized (i.e., scaled) to make variables comparable. Standardization consists of transforming the variables such that they have mean zero and standard deviation one. 
+
+We will use "Agglomerative clustering" ( AGNES - Agglomerative Nesting). It works in a bottom-up manner. That is, each object is initially considered as a single-element cluster (leaf). At each step of the algorithm, the two clusters that are the most similar are combined into a new bigger cluster (nodes). This procedure is iterated until all points are member of just one single big cluster (root) (see figure below). The result is a tree which can be plotted as a dendrogram.
+
+```{r echo = FALSE}
+#Note, we had to import library(e1071) for this
+set.seed(7046)
+
+
+```
+
+
+
+```{r echo = FALSE}
+#Reference https://uc-r.github.io/hc_clustering
+# To perform a cluster analysis in R, generally, the data should be prepared as follows:
+# 
+# Rows are observations (individuals) and columns are variables
+# Any missing value in the data must be removed or estimated.
+# The data must be standardized (i.e., scaled) to make variables comparable. Recall that, standardization consists of transforming the variables such that they have mean zero and standard deviation one.[^scale]
+set.seed(7046)
+iris_sc <- scale(iris[,1:4])
+
+# Agglomerative clustering: It’s also known as AGNES (Agglomerative Nesting). It works in a bottom-up manner. That is, each object is initially considered as a single-element cluster (leaf). At each step of the algorithm, the two clusters that are the most similar are combined into a new bigger cluster (nodes). This procedure is iterated until all points are member of just one single big cluster (root) (see figure below). The result is a tree which can be plotted as a dendrogram.
+# 
+# We can perform agglomerative HC with hclust. First we compute the dissimilarity values with dist and then feed these values into hclust and specify the agglomeration method to be used (i.e. “complete”, “average”, “single”, “ward.D”). We can then plot the dendrogram.
+
+# Dissimilarity matrix
+distance <- dist(iris_sc, method = "euclidean")
+
+# Hierarchical clustering using Complete Linkage
+hc1 <- hclust(distance, method = "complete" )
+
+# Plot the obtained dendrogram
+plot(hc1, cex = 0.6, hang = -1)
+```
+
+#### Optimum number of clusters
+We observe a "bend" at cluster = 3 where there are diminishing returns as the number of clusters increase.  Thus, we will use 3 as our final cluster count.   
+
+```{r echo = FALSE}
+#https://www.rdocumentation.org/packages/factoextra/versions/1.0.6/topics/fviz_nbclust
+set.seed(7046)
+fviz_nbclust(iris_sc, hcut, method = "wss")
+```
+
+Here we can visualize the 3 clusters in the dendrogram.  
+
+```{r echo = FALSE}
+# Cut tree into 3 groups
+sub_grp <- cutree(hc1, k = 3)
+
+# Number of members in each cluster
+#table(sub_grp)
+## sub_grp
+##  1  2  3  4 
+##  7 12 19 12
+
+
+
+#add the clusters to the dataset  -- for some reason this prints out in RMD so comment out
+#iris %>%
+#  mutate(cluster = sub_grp) 
+
+plot(hc1, cex = 0.6)
+rect.hclust(hc1, k = 3, border = 2:5)
+```
+
+This visualization shows the data for each cluster in a two dimensional space.  You can get an appreciation for the inter-group similarities, and the dis-similar distance between groups.  
+```{r echo = FALSE}
+fviz_cluster(list(data = iris[,1:4], cluster = sub_grp))
+```
+
+### Performance -- Need to determine how well it categorized vs K - Means
+
+```{r echo = FALSE}
+
+
+```
 
